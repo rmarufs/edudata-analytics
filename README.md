@@ -44,7 +44,6 @@ edudata-analytics/
 ├── run.sh                          # Скрипт для запуска приложения
 ├── .env.example                    # Пример переменных окружения
 ├── .gitignore                      # Git исключения
-├── SUPABASE_SETUP.md               # Инструкции по настройке Supabase
 ├── supabase_schema.sql             # SQL схема базы данных
 │
 ├── .streamlit/                     # Конфигурация Streamlit
@@ -197,14 +196,12 @@ streamlit run Home.py
 2. **Получить credentials**:
    - URL проекта
    - Anon/Public ключ
-3. **Инициализировать БД**: Запустить `supabase_schema.sql` (смотри [SUPABASE_SETUP.md](SUPABASE_SETUP.md))
+3. **Инициализировать БД**: Запустить SQL-скрипт `supabase_schema.sql` в Supabase SQL Editor
 4. **Добавить в `.env`**:
    ```env
    SUPABASE_URL=https://your-project.supabase.co/rest/v1/
    SUPABASE_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
    ```
-
-Подробнее: [SUPABASE_SETUP.md](SUPABASE_SETUP.md)
 
 ---
 
@@ -255,6 +252,9 @@ source venv/bin/activate
 
 # Проверяем импорты
 python3 -c "import streamlit; import pandas; print('✓ Все зависимости установлены')"
+
+# Запускаем автоматические тесты проекта
+PYTHONPYCACHEPREFIX=/tmp/edudata_pycache python3 -m unittest discover -s tests
 
 # Запускаем приложение
 streamlit run Home.py

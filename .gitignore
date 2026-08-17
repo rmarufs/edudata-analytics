@@ -29,6 +29,8 @@ dist/
 
 # Test cache
 .pytest_cache/
+.coverage
+htmlcov/
 
 # Streamlit secrets and config
 .streamlit/secrets.toml

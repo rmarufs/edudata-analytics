@@ -21,16 +21,19 @@ def load_data(uploaded_file) -> pd.DataFrame:
     for col in df.columns:
         dtype = df[col].dtype
         if dtype == "object":
-            df[col] = df[col].astype(str).str.strip().str.replace(",", ".")
-            mask = df[col].apply(looks_like_number)
+            stripped = df[col].astype("string").str.strip()
+            normalized = stripped.str.replace(",", ".", regex=False)
+            mask = normalized.fillna("").apply(looks_like_number)
             rate = mask.mean()
             if rate > 0.9:
                 try:
-                    df[col] = pd.to_numeric(df[col], errors="raise")
+                    df[col] = pd.to_numeric(normalized, errors="raise")
                     conversion_log.append(f"{col}: object → float ({rate:.0%})")
-                except:
+                except Exception:
+                    df[col] = stripped
                     conversion_log.append(f"{col}: оставлен как текст")
             else:
+                df[col] = stripped
                 conversion_log.append(f"{col}: текст ({rate:.0%} чисел)")
         else:
             conversion_log.append(f"{col}: {dtype}")

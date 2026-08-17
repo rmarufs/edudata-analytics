@@ -73,13 +73,13 @@ def standard_auto_cleaning(df: pd.DataFrame, target_col: str = None):
             s = df_clean[col]
             if pd.api.types.is_numeric_dtype(s) and not is_categorical(s):
                 val = s.median()
-                df_clean[col].fillna(val, inplace=True)
+                df_clean[col] = df_clean[col].fillna(val)
                 action = f"заполнено median={val:.2f}"
             else:
                 mode = s.mode()
                 if not mode.empty:
                     val = mode[0]
-                    df_clean[col].fillna(val, inplace=True)
+                    df_clean[col] = df_clean[col].fillna(val)
                     action = f"заполнено mode='{val}'"
                 else:
                     action = "не заполнено: mode пустой"
@@ -157,17 +157,17 @@ def fill_na(df: pd.DataFrame, cols: list, method: str, constant_value=None) -> p
             continue
         series = df_clean[col]
         if method == "mean" and pd.api.types.is_numeric_dtype(series):
-            df_clean[col].fillna(series.mean(), inplace=True)
+            df_clean[col] = df_clean[col].fillna(series.mean())
         elif method == "median" and pd.api.types.is_numeric_dtype(series):
-            df_clean[col].fillna(series.median(), inplace=True)
+            df_clean[col] = df_clean[col].fillna(series.median())
         elif method == "mode":
             mode = series.mode()
             if not mode.empty:
-                df_clean[col].fillna(mode[0], inplace=True)
+                df_clean[col] = df_clean[col].fillna(mode[0])
         elif method == "constant":
-            df_clean[col].fillna(constant_value, inplace=True)
+            df_clean[col] = df_clean[col].fillna(constant_value)
         elif method == "unknown":
-            df_clean[col].fillna("unknown", inplace=True)
+            df_clean[col] = df_clean[col].fillna("unknown")
     return df_clean
 
 def remove_duplicates(df: pd.DataFrame) -> pd.DataFrame:

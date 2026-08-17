@@ -86,21 +86,6 @@ def prepare_features_and_target_catboost(
     return X, y, cat_features
 
 
-def compute_catboost_feature_importance(model, feature_names: List[str], signed: bool = True) -> pd.DataFrame:
-    try:
-        if signed:
-            importances = model.get_feature_importance(type="PredictionValuesChange")
-        else:
-            importances = model.get_feature_importance()
-        df_imp = pd.DataFrame({"feature": feature_names, "importance": importances}).sort_values(
-            "importance", ascending=False
-        )
-        return df_imp
-    except Exception as e:
-        raise RuntimeError(f"Ошибка важности признаков: {e}")
-
-
-
 # -----------------------------
 # Valid eval metrics by task
 # -----------------------------
@@ -399,6 +384,12 @@ def plot_feature_importance_signed(imp_df: pd.DataFrame, top_n: int = 10) -> Dic
     )
     fig_pos.update_layout(height=420, xaxis_title="Importance (+)", yaxis_title="")
     figs["pos"] = fig_pos
+
+    fig_neg = px.bar(
+        neg_df.iloc[::-1], x="importance", y="feature", orientation="h", title="Negative feature effects"
+    )
+    fig_neg.update_layout(height=420, xaxis_title="Importance (-)", yaxis_title="")
+    figs["neg"] = fig_neg
 
     return figs
 
