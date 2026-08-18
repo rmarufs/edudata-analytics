@@ -52,7 +52,7 @@ def prepare_features_and_target_catboost(
     """
     Универсальная подготовка:
     - Автокодирование категориального таргета
-    - Определение категориальных признаков
+    - Определение категориальных признаков (включая datetime и смешанные типы)
     - Проверка пустых данных и константного таргета
     """
     if target_col not in df.columns:
@@ -62,7 +62,7 @@ def prepare_features_and_target_catboost(
         raise ValueError("Датасет пустой.")
 
     y = df[target_col].copy()
-    X = df.drop(columns=[target_col])
+    X = df.drop(columns=[target_col]).copy()
 
     # Проверки целевой
     if y.dropna().nunique() < 2:
@@ -70,11 +70,32 @@ def prepare_features_and_target_catboost(
 
     if not pd.api.types.is_numeric_dtype(y):
         classes = y.dropna().unique()
-        mapping = {cls: i for i, cls in enumerate(sorted(classes))}
+        mapping = {cls: i for i, cls in enumerate(sorted(classes, key=str))}
         y = y.map(mapping)
 
-    # Категориальные признаки
-    cat_features = X.select_dtypes(include=["object", "category"]).columns.tolist()
+    # Базовые категориальные признаки по dtype
+    cat_features = set(X.select_dtypes(include=["object", "category"]).columns.tolist())
+
+    # Дополнительно: datetime-колонки -> категориальные (строкой)
+    for col in X.select_dtypes(include=["datetime", "datetimetz"]).columns:
+        X[col] = X[col].astype(str)
+        cat_features.add(col)
+
+    # Дополнительно: числовые колонки со строковыми значениями внутри (смешанные типы)
+    for col in list(X.columns):
+        if col in cat_features:
+            continue
+        if not pd.api.types.is_numeric_dtype(X[col]):
+            converted = pd.to_numeric(X[col], errors="coerce")
+            if converted.isna().sum() > X[col].isna().sum():
+                X[col] = X[col].astype(str)
+                cat_features.add(col)
+
+    cat_features = list(cat_features)
+
+    # Приводим все категориальные к строке (убираем NaN)
+    for col in cat_features:
+        X[col] = X[col].fillna("").astype(str)
 
     # Если есть полностью пустые колонки/строки, подскажем
     if X.isnull().all(axis=0).any():
@@ -196,13 +217,13 @@ def train_catboost_universal(
     random_seed: int = 42
 ):
     try:
-        # Приводим категориальные признаки к строкам
+        # Приводим категориальные признаки к строкам (на случай split-артефактов)
         for col in cat_features:
-            X_train[col] = X_train[col].astype(str)
-            X_val[col] = X_val[col].astype(str)
+            X_train[col] = X_train[col].fillna("").astype(str)
+            X_val[col] = X_val[col].fillna("").astype(str)
 
         # Получаем индексы категориальных признаков
-        cat_features_idx = [X_train.columns.get_loc(col) for col in cat_features]
+        cat_features_idx = [X_train.columns.get_loc(col) for col in cat_features if col in X_train.columns]
 
         # Строим модель
         model = build_catboost(
