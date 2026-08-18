@@ -48,7 +48,6 @@ pages = {
         st.Page(show_home, title=t("Главная"), icon="🏠", default=True),
     ],
     t("Данные"): [
-        st.Page("pages/00_Projects.py", title=t("Проекты"), icon="🗂️"),
         st.Page("pages/01_Data_Upload.py", title=t("Загрузка данных"), icon="📥"),
         st.Page("pages/02_Auto_Processing.py", title=t("Автообработка данных"), icon="🛡️"),
         st.Page("pages/03_Missing_Values.py", title=t("Обработка пропусков"), icon="⚙️"),
