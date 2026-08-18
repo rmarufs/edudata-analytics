@@ -61,9 +61,10 @@ pages = {
     t("Моделирование"): [
         st.Page("pages/08_Logistic_Regression.py", title=t("Логистическая регрессия"), icon="📈"),
         st.Page("pages/09_CatBoost_Modeling.py", title=t("CatBoost моделирование"), icon="🐈"),
+        st.Page("pages/10_GMDH_Modeling.py", title=t("МГУА (GMDH)"), icon="🧠"),
     ],
     t("Помощь"): [
-        st.Page("pages/10_AI_Chat.py", title=t("Чат с ИИ"), icon="💬"),
+        st.Page("pages/11_AI_Chat.py", title=t("Чат с ИИ"), icon="💬"),
     ]
 }
 
