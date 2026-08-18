@@ -27,8 +27,9 @@ def _read_model_list(name, default_models):
 API_KEY = _read_secret_or_env("OPENAI_API_KEY")
 DEFAULT_LLM_MODEL = _read_secret_or_env(
     "OPENROUTER_MODEL",
-    "cognitivecomputations/dolphin-mistral-24b-venice-edition:free",
+    "z-ai/glm-5.2:free",
 )
+
 FALLBACK_LLM_MODELS = _read_model_list(
     "OPENROUTER_FALLBACK_MODELS",
     [
